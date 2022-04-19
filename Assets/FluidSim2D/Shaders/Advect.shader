@@ -46,7 +46,7 @@ Shader "FluidSim/Advect" // decleration (where to find / Name)
 			    
 			    float2 coord = IN.uv - (u * _InverseSize * _TimeStep);   // backwardstracing 
 			    
-			    float4 result = _Dissipation * tex2D(_Source, coord);// tex2d gives back the value of the sample2D at the coords
+			    float4 result = _Dissipation * tex2D(_Source, (coord));// tex2d gives back the value of the sample2D at the coords
 				// but how does it take the everage of all textures 
 			    
 				float solid = tex2D(_Obstacles, IN.uv).x;

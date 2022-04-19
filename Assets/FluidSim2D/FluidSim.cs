@@ -1,6 +1,7 @@
 
 using System.Collections;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace FluidSim2DProject
 {
@@ -14,8 +15,8 @@ namespace FluidSim2DProject
       
         public Material m_guiMat, m_advectMat, m_buoyancyMat, m_divergenceMat, m_jacobiMat, m_impluseMat, m_gradientMat, m_obstaclesMat;
 
-        RenderTexture m_guiTex, m_divergenceTex, m_obstaclesTex;
-        RenderTexture[] m_velocityTex, m_densityTex, m_pressureTex, m_temperatureTex;
+        RenderTexture m_guiTex, m_divergenceTex;// m_obstaclesTex;
+        RenderTexture[] m_velocityTex, m_densityTex, m_pressureTex, m_temperatureTex, m_obstaclesTex;
 
         [SerializeField] float m_impulseTemperature = 10.0f;
         [SerializeField] float m_impulseDensity = 1.0f;
@@ -37,8 +38,9 @@ namespace FluidSim2DProject
         float m_mouseImpluseRadius = 0.05f;
 
         // Obstacle 
-        Vector2 m_obstaclePos = new Vector2(0.5f, 0.5f);
-        float m_obstacleRadius = 0.1f;
+        public List<Vector2> m_obstaclePos = new List<Vector2>();
+   
+        float m_obstacleRadius = 0.05f;
 
         Rect m_rect;
         [SerializeField] int m_width = 512;
@@ -47,7 +49,11 @@ namespace FluidSim2DProject
  
         void Start()
         {
-           
+            // add Obstacles
+            m_obstaclePos.Add(new Vector2(0.5f, 0.4f));
+            m_obstaclePos.Add(new Vector2(0.5f, 0.7f));
+            m_obstaclePos.Add(new Vector2(0.4f, 0.8f));
+
             Vector2 size = new Vector2(m_width, m_height);
             Vector2 pos = new Vector2(Screen.width / 2, Screen.height / 2) - size * 0.5f;//?
             m_rect = new Rect(pos, size);
@@ -59,12 +65,14 @@ namespace FluidSim2DProject
             m_densityTex = new RenderTexture[2];
             m_temperatureTex = new RenderTexture[2];
             m_pressureTex = new RenderTexture[2];
+            m_obstaclesTex = new RenderTexture[2];
 
             // init/ create Rendertextures
             CreateSurface(m_velocityTex, RenderTextureFormat.RGFloat, FilterMode.Bilinear);
             CreateSurface(m_densityTex, RenderTextureFormat.RFloat, FilterMode.Bilinear);
             CreateSurface(m_temperatureTex, RenderTextureFormat.RFloat, FilterMode.Bilinear);
             CreateSurface(m_pressureTex, RenderTextureFormat.RFloat, FilterMode.Point);
+            CreateSurface(m_obstaclesTex, RenderTextureFormat.RFloat, FilterMode.Point);
 
             // make specific textures 
             m_guiTex = new RenderTexture(m_width, m_height, 0, RenderTextureFormat.ARGB32);
@@ -77,10 +85,10 @@ namespace FluidSim2DProject
             m_divergenceTex.wrapMode = TextureWrapMode.Clamp;
             m_divergenceTex.Create();
 
-            m_obstaclesTex = new RenderTexture(m_width, m_height, 0, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear);
-            m_obstaclesTex.filterMode = FilterMode.Point;
-            m_obstaclesTex.wrapMode = TextureWrapMode.Clamp;
-            m_obstaclesTex.Create();
+            //m_obstaclesTex = new RenderTexture(m_width, m_height, 0, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear);
+            //m_obstaclesTex.filterMode = FilterMode.Point;
+            //m_obstaclesTex.wrapMode = TextureWrapMode.Clamp;
+            //m_obstaclesTex.Create();
         }
 
         void OnGUI() // GUI = graphical user interface 
@@ -109,7 +117,7 @@ namespace FluidSim2DProject
             m_advectMat.SetFloat("_Dissipation", dissipation);
             m_advectMat.SetTexture("_Velocity", velocity);
             m_advectMat.SetTexture("_Source", source);
-            m_advectMat.SetTexture("_Obstacles", m_obstaclesTex);
+            m_advectMat.SetTexture("_Obstacles", m_obstaclesTex[0]);
 
             Graphics.Blit(null, dest, m_advectMat); // copies source into a rendertexture with shader (bit block transfer)
         }
@@ -142,7 +150,7 @@ namespace FluidSim2DProject
             m_divergenceMat.SetFloat("_HalfInverseCellSize", 0.5f / m_cellSize);
             m_divergenceMat.SetTexture("_Velocity", velocity);
             m_divergenceMat.SetVector("_InverseSize", m_inverseSize);
-            m_divergenceMat.SetTexture("_Obstacles", m_obstaclesTex);
+            m_divergenceMat.SetTexture("_Obstacles", m_obstaclesTex[0]);
 
             Graphics.Blit(null, dest, m_divergenceMat);
         }
@@ -155,7 +163,7 @@ namespace FluidSim2DProject
             m_jacobiMat.SetVector("_InverseSize", m_inverseSize);
             m_jacobiMat.SetFloat("_Alpha", -m_cellSize * m_cellSize);
             m_jacobiMat.SetFloat("_InverseBeta", 0.25f);
-            m_jacobiMat.SetTexture("_Obstacles", m_obstaclesTex);
+            m_jacobiMat.SetTexture("_Obstacles", m_obstaclesTex[0]);
 
             Graphics.Blit(null, dest, m_jacobiMat);
         }
@@ -166,18 +174,27 @@ namespace FluidSim2DProject
             m_gradientMat.SetTexture("_Pressure", pressure);
             m_gradientMat.SetFloat("_GradientScale", m_gradientScale);
             m_gradientMat.SetVector("_InverseSize", m_inverseSize);
-            m_gradientMat.SetTexture("_Obstacles", m_obstaclesTex);
+            m_gradientMat.SetTexture("_Obstacles", m_obstaclesTex[0]);
 
             Graphics.Blit(null, dest, m_gradientMat);
         }
 
         void AddObstacles()
         {
-            m_obstaclesMat.SetVector("_InverseSize", m_inverseSize);
-            m_obstaclesMat.SetVector("_Point", m_obstaclePos);
-            m_obstaclesMat.SetFloat("_Radius", m_obstacleRadius);
 
-            Graphics.Blit(null, m_obstaclesTex, m_obstaclesMat);
+            // i have to make 2 textures read from one then blit from the other to the material -> swap
+            for (int i = 0; i < m_obstaclePos.Count; i++)
+            {
+                m_obstaclesMat.SetTexture("_Obstacle", m_obstaclesTex[0]);
+                m_obstaclesMat.SetVector("_InverseSize", m_inverseSize);
+                m_obstaclesMat.SetVector("_Point", m_obstaclePos[i]);
+                m_obstaclesMat.SetFloat("_Radius", m_obstacleRadius);
+                  
+                Graphics.Blit(null, m_obstaclesTex[1], m_obstaclesMat);
+                Swap(m_obstaclesTex);
+
+            }
+
         }
 
         void ClearSurface(RenderTexture surface)
@@ -280,7 +297,7 @@ namespace FluidSim2DProject
             Swap(m_velocityTex);
 
             //Render the tex you want to see into gui tex. Will only use the red channel
-            m_guiMat.SetTexture("_Obstacles", m_obstaclesTex);
+            m_guiMat.SetTexture("_Obstacles", m_obstaclesTex[0]);
             Graphics.Blit(m_densityTex[READ], m_guiTex, m_guiMat);
         }
     }

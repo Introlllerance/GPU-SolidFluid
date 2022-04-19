@@ -3,10 +3,10 @@
 
 Shader "FluidSim/Obstacle" 
 {
-	SubShader 
+	SubShader
 	{
-    	Pass 
-    	{
+		Pass
+		{
 			ZTest Always
 
 			CGPROGRAM
@@ -14,7 +14,9 @@ Shader "FluidSim/Obstacle"
 			#pragma target 3.0
 			#pragma vertex vert
 			#pragma fragment frag
-			
+
+			uniform sampler2D _Obstacle;
+
 			uniform float2 _InverseSize;
 			uniform float2 _Point;
 			uniform float _Radius;
@@ -35,8 +37,9 @@ Shader "FluidSim/Obstacle"
 			
 			float4 frag(v2f IN) : COLOR
 			{
-				float4 result = float4(0,0,0,0);
-				
+				//float4 result = float4(0,0,0,0);
+				float4 result = tex2D(_Obstacle,IN.uv);
+
 				//draw border 
 				if(IN.uv.x <= _InverseSize.x) result = float4(1,1,1,1);
 				if(IN.uv.x >= 1.0-_InverseSize.x) result = float4(1,1,1,1);

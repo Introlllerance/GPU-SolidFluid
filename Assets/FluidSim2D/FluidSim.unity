@@ -246,7 +246,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_fluidColor: {r: 1, g: 0, b: 0.75604343, a: 1}
-  m_obstacleColor: {r: 1, g: 1, b: 1, a: 1}
+  m_obstacleColor: {r: 0, g: 1, b: 0.20892715, a: 1}
   m_guiMat: {fileID: 2100000, guid: 229dd8ae0f4c09b42b2e04d481aa5be2, type: 2}
   m_advectMat: {fileID: 2100000, guid: 3f34f12aff931564887e9c22cb6b76c4, type: 2}
   m_buoyancyMat: {fileID: 2100000, guid: 579b27956d9f9934980c3a53e430a66c, type: 2}
@@ -260,6 +260,7 @@ MonoBehaviour:
   m_smokeBuoyancy: 1
   m_smokeWeight: 0.05
   m_numJacobiIterations: 80
+  m_obstaclePos: []
   m_width: 512
   m_height: 512
 --- !u!1 &1063733314
