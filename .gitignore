@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/GPU-GEMS-2D-Fluid-Simulation.sln
+/Assembly-CSharp.csproj
+/UserSettings
+/Temp
+/obj/Debug
+/Logs
+/Library
+/.vs/GPU-GEMS-2D-Fluid-Simulation/v16
