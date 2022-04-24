@@ -6,14 +6,14 @@ using System.Collections.Generic;
 namespace FluidSim2DProject
 {
 
-    public class FluidSim : MonoBehaviour
+    public class Test : MonoBehaviour
     {
 
         public Color m_fluidColor = Color.red;
 
         public Color m_obstacleColor = Color.white;
       
-        public Material m_guiMat, m_advectMat, m_buoyancyMat, m_divergenceMat, m_jacobiMat, m_impluseMat, m_gradientMat, m_obstaclesMat; // on the materials is the shader -> set all to the material
+        public Material m_guiMat, m_advectMat, m_buoyancyMat, m_updateMovementMat, m_divergenceMat, m_jacobiMat, m_impluseMat, m_gradientMat, m_obstaclesMat;
 
         RenderTexture m_guiTex, m_divergenceTex;// m_obstaclesTex;
         RenderTexture[] m_velocityTex, m_densityTex, m_pressureTex, m_temperatureTex, m_obstaclesTex;
@@ -36,9 +36,10 @@ namespace FluidSim2DProject
         [SerializeField] int m_numJacobiIterations = 80;
 
         // Impuls / Mouseinput
-        Vector2 m_implusePos = new Vector2(0.5f, 0.0f);
-        float m_impluseRadius = 0.1f;
-        float m_mouseImpluseRadius = 0.05f;
+        Vector2 m_implusePos = new Vector2(0.5f, 0.1f);
+        [SerializeField] float m_impluseRadius = 0.1f;
+        [SerializeField] float m_mouseImpluseRadius = 0.05f;
+        [SerializeField] float m_impulseScale = 2.0f;
 
         // Obstacle 
         public List<Vector2> m_obstaclePos = new List<Vector2>();
@@ -141,6 +142,20 @@ namespace FluidSim2DProject
 
             Graphics.Blit(null, dest, m_buoyancyMat);
         }
+        void UpdateMovement(RenderTexture velocity, RenderTexture density, RenderTexture dest,Vector2 pos)
+        {
+            //Buoyancy based on Temperatur/ smoke ambiente and Density and weight and bouyandyVar 
+            m_updateMovementMat.SetTexture("_Velocity", velocity);
+            m_updateMovementMat.SetTexture("_Density", density);
+
+            m_updateMovementMat.SetVector("_Point", pos);
+            m_updateMovementMat.SetFloat("_Radius", m_impluseRadius);
+            m_updateMovementMat.SetFloat("_ImpulsScale", m_impulseScale);
+        
+
+            Graphics.Blit(null, dest, m_updateMovementMat);
+        }
+
 
         void ApplyImpulse(RenderTexture source, RenderTexture dest, Vector2 pos, float radius, float val)
         {
@@ -151,7 +166,6 @@ namespace FluidSim2DProject
 
             Graphics.Blit(null, dest, m_impluseMat);
         }
-        
 
         void ComputeDivergence(RenderTexture velocity, RenderTexture dest)
         {
@@ -256,16 +270,21 @@ namespace FluidSim2DProject
             Swap(m_densityTex);
 
             // change the velocity of flow based on temperatur and density of fluid
-            ApplyBuoyancy(m_velocityTex[READ], m_temperatureTex[READ], m_densityTex[READ], m_velocityTex[WRITE], dt);
+            //ApplyBuoyancy(m_velocityTex[READ], m_temperatureTex[READ], m_densityTex[READ], m_velocityTex[WRITE], dt);
 
-            Swap(m_velocityTex);
+            //Swap(m_velocityTex);
 
-            //Add source to texture 
-            ApplyImpulse(m_temperatureTex[READ], m_temperatureTex[WRITE], m_implusePos, m_impluseRadius, m_impulseTemperature);
-            ApplyImpulse(m_densityTex[READ], m_densityTex[WRITE], m_implusePos, m_impluseRadius, m_impulseDensity);
+            //Add particles at specific point
+            if (false)
+            {
+                ApplyImpulse(m_temperatureTex[READ], m_velocityTex[WRITE], m_implusePos, m_impluseRadius, m_impulseTemperature);
+                ApplyImpulse(m_densityTex[READ], m_densityTex[WRITE], m_implusePos, m_impluseRadius, m_impulseDensity);
+                UpdateMovement(m_velocityTex[READ], m_densityTex[READ], m_velocityTex[WRITE], m_implusePos);
 
-            Swap(m_temperatureTex);
-            Swap(m_densityTex);
+                Swap(m_temperatureTex);
+                Swap(m_densityTex);
+                Swap(m_velocityTex);
+            }
 
             //If left click down add impluse, if right click down remove impulse from mouse pos.
             if(Input.GetMouseButton(0) || Input.GetMouseButton(1))
@@ -282,9 +301,13 @@ namespace FluidSim2DProject
 
                 ApplyImpulse(m_temperatureTex[READ], m_temperatureTex[WRITE], pos, m_mouseImpluseRadius, m_impulseTemperature);
                 ApplyImpulse(m_densityTex[READ], m_densityTex[WRITE], pos, m_mouseImpluseRadius, m_impulseDensity * sign);
+                UpdateMovement(m_velocityTex[READ], m_densityTex[READ], m_velocityTex[WRITE], pos);
 
                 Swap(m_temperatureTex);
                 Swap(m_densityTex);
+                Swap(m_velocityTex);
+
+
             }
 
             ///////////// Project ////////////////

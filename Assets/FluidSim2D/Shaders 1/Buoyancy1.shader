@@ -1,7 +1,7 @@
 // Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
 
-Shader "FluidSim/Buoyancy" 
+Shader "FluidSim/Buoyancy1" 
 {
 	SubShader 
 	{

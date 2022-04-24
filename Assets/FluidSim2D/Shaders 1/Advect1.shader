@@ -1,7 +1,7 @@
 // Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
 
-Shader "FluidSim/Advect" // decleration (where to find / Name)
+Shader "FluidSim/Advect1" // decleration (where to find / Name)
 {
 	SubShader // most of the logic
 	{
