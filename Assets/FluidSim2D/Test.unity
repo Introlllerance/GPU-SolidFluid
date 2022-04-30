@@ -245,12 +245,14 @@ MonoBehaviour:
   m_obstaclesMat: {fileID: 2100000, guid: 6974ef9abb2c0fc47ba442196377a907, type: 2}
   m_cmytorgbMat: {fileID: 2100000, guid: e3c04781539d89d429580120280d05e8, type: 2}
   m_rgbtocmyMat: {fileID: 2100000, guid: 26b2eeae57777914db30638db5c1a6f6, type: 2}
+  m_advectColorMat: {fileID: 2100000, guid: c9cfbde3608c9b342b5ce629f3f5e614, type: 2}
+  m_addcolorMat: {fileID: 2100000, guid: 85b9183859a39184ea8265eed829607c, type: 2}
   m_guiTex: {fileID: 0}
   m_divergenceTex: {fileID: 0}
   m_rgbTex: {fileID: 0}
   m_cmyTex: []
   m_impulseTemperature: 10
-  m_impulseDensity: 1
+  m_impulseDensity: 0.04
   m_temperatureDissipation: 0.99
   m_velocityDissipation: 0.99
   m_densityDissipation: 0.9999
