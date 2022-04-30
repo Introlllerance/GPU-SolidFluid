@@ -232,8 +232,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e54b55115a7a8a84b85dc8aad3576ba4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_fluidColor: {r: 1, g: 0, b: 0.95341825, a: 1}
-  m_obstacleColor: {r: 0, g: 1, b: 0.17274213, a: 1}
+  m_fluidColor: {r: 1, g: 0, b: 0.13062668, a: 1}
+  m_obstacleColor: {r: 1, g: 0.653165, b: 0, a: 1}
   m_guiMat: {fileID: 2100000, guid: a5e50cfeb3b93bf4197019b67114ff6c, type: 2}
   m_advectMat: {fileID: 2100000, guid: 9f565ce40c7cdff47a4499adc87114e7, type: 2}
   m_buoyancyMat: {fileID: 2100000, guid: 68dae5dee4ec59549b19752db28f52a5, type: 2}
@@ -243,6 +243,12 @@ MonoBehaviour:
   m_impluseMat: {fileID: 2100000, guid: ddffc9dfc55af304bbb9c739fc88e534, type: 2}
   m_gradientMat: {fileID: 2100000, guid: 6a5ace24d98685644b2dd0e55fca3d51, type: 2}
   m_obstaclesMat: {fileID: 2100000, guid: 6974ef9abb2c0fc47ba442196377a907, type: 2}
+  m_cmytorgbMat: {fileID: 2100000, guid: e3c04781539d89d429580120280d05e8, type: 2}
+  m_rgbtocmyMat: {fileID: 2100000, guid: 26b2eeae57777914db30638db5c1a6f6, type: 2}
+  m_guiTex: {fileID: 0}
+  m_divergenceTex: {fileID: 0}
+  m_rgbTex: {fileID: 0}
+  m_cmyTex: []
   m_impulseTemperature: 10
   m_impulseDensity: 1
   m_temperatureDissipation: 0.99

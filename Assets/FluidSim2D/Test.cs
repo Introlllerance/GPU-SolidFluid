@@ -13,10 +13,11 @@ namespace FluidSim2DProject
 
         public Color m_obstacleColor = Color.white;
       
-        public Material m_guiMat, m_advectMat, m_buoyancyMat, m_updateMovementMat, m_divergenceMat, m_jacobiMat, m_impluseMat, m_gradientMat, m_obstaclesMat;
+        public Material m_guiMat, m_advectMat, m_buoyancyMat, m_updateMovementMat, m_divergenceMat, m_jacobiMat, m_impluseMat, m_gradientMat, m_obstaclesMat, m_cmytorgbMat, m_rgbtocmyMat;
 
-        RenderTexture m_guiTex, m_divergenceTex;// m_obstaclesTex;
+        [SerializeField] RenderTexture m_guiTex, m_divergenceTex, m_rgbTex;// m_obstaclesTex;
         RenderTexture[] m_velocityTex, m_densityTex, m_pressureTex, m_temperatureTex, m_obstaclesTex;
+        [SerializeField] RenderTexture[] m_cmyTex;
 
         [SerializeField] float m_impulseTemperature = 10.0f;
         [SerializeField] float m_impulseDensity = 1.0f;
@@ -71,6 +72,7 @@ namespace FluidSim2DProject
             m_temperatureTex = new RenderTexture[2];
             m_pressureTex = new RenderTexture[2];
             m_obstaclesTex = new RenderTexture[2];
+            m_cmyTex = new RenderTexture[2];
 
             // init/ create Rendertextures
             CreateSurface(m_velocityTex, RenderTextureFormat.RGFloat, FilterMode.Bilinear);
@@ -78,12 +80,23 @@ namespace FluidSim2DProject
             CreateSurface(m_temperatureTex, RenderTextureFormat.RFloat, FilterMode.Bilinear);
             CreateSurface(m_pressureTex, RenderTextureFormat.RFloat, FilterMode.Point);
             CreateSurface(m_obstaclesTex, RenderTextureFormat.RFloat, FilterMode.Point);
+            CreateSurface(m_cmyTex, RenderTextureFormat.ARGB32, FilterMode.Bilinear);
 
             // make specific textures 
             m_guiTex = new RenderTexture(m_width, m_height, 0, RenderTextureFormat.ARGB32);
             m_guiTex.filterMode = FilterMode.Bilinear;
             m_guiTex.wrapMode = TextureWrapMode.Clamp;
             m_guiTex.Create();
+            
+            m_rgbTex = new RenderTexture(m_width, m_height, 0, RenderTextureFormat.ARGB32);
+            m_rgbTex.filterMode = FilterMode.Bilinear;
+            m_rgbTex.wrapMode = TextureWrapMode.Clamp;
+            m_rgbTex.Create();
+            
+            //m_cmyTex = new RenderTexture(m_width, m_height, 0, RenderTextureFormat.ARGB32);
+            //m_cmyTex.filterMode = FilterMode.Bilinear;
+            //m_cmyTex.wrapMode = TextureWrapMode.Clamp;
+            //m_cmyTex.Create();
 
             m_divergenceTex = new RenderTexture(m_width, m_height, 0, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear);
             m_divergenceTex.filterMode = FilterMode.Point;
@@ -98,7 +111,7 @@ namespace FluidSim2DProject
 
         void OnGUI() // GUI = graphical user interface 
         {
-            GUI.DrawTexture(m_rect, m_guiTex);
+            GUI.DrawTexture(m_rect, m_rgbTex);
         }
 
         void CreateSurface(RenderTexture[] surface, RenderTextureFormat format, FilterMode filter)
@@ -232,6 +245,19 @@ namespace FluidSim2DProject
             texs[0] = texs[1];
             texs[1] = temp;
         }
+        void CMYtoRGB(RenderTexture cmy, RenderTexture rgb)
+        {
+            m_cmytorgbMat.SetTexture("CMY", cmy);
+
+            Graphics.Blit(null, rgb, m_cmytorgbMat);
+        }
+
+        void RGBtoCMY(RenderTexture rgb, RenderTexture cmy)
+        {
+            m_rgbtocmyMat.SetTexture("RGB", rgb);
+
+            Graphics.Blit(null, cmy, m_rgbtocmyMat);
+        }
 
         void FixedUpdate()
         {
@@ -263,7 +289,9 @@ namespace FluidSim2DProject
             //Advect temperature against velocity
             Advect(m_velocityTex[READ], m_temperatureTex[READ], m_temperatureTex[WRITE], m_temperatureDissipation, dt);
             //Advect density against velocity
-            Advect(m_velocityTex[READ], m_densityTex[READ], m_densityTex[WRITE], m_densityDissipation, dt);
+            Advect(m_velocityTex[READ], m_densityTex[READ], m_densityTex[WRITE], m_densityDissipation, dt);            
+            //Advect col/cmy against velocity
+            //Advect(m_velocityTex[READ], m_cmyTex[READ], m_cmyTex[WRITE], 1, dt);
 
             Swap(m_velocityTex);
             Swap(m_temperatureTex);
@@ -329,9 +357,20 @@ namespace FluidSim2DProject
 
             Swap(m_velocityTex);
 
+            
+
+
             //Render the tex you want to see into gui tex. Will only use the red channel
-            m_guiMat.SetTexture("_Obstacles", m_obstaclesTex[0]);
-            Graphics.Blit(m_densityTex[READ], m_guiTex, m_guiMat);
+            m_guiMat.SetTexture("_Obstacles", m_obstaclesTex[READ]);
+            m_guiMat.SetTexture("_MainTex", m_cmyTex[READ]);
+            Graphics.Blit(m_cmyTex[READ], m_cmyTex[WRITE], m_guiMat);
+           
+            Swap(m_cmyTex);
+
+            CMYtoRGB(m_cmyTex[READ], m_rgbTex);
+            //Graphics.Blit(m_cmyTex[READ], m_rgbTex, m_cmytorgbMat);
+
+
         }
     }
 
