@@ -54,7 +54,7 @@ Shader "FluidSim/AddColor"
 					float dens = tex2D(_Density, IN.uv).x;
 			  
 					 //result = ((sourceCol * dens/impulse) + _ColorCMY * impulse/dens) / (2.f * impulse * dens);
-					 result = ((sourceCol ) + _ColorCMY ) / (2.f );
+					 result = ((sourceCol  ) + _ColorCMY  ) / (2.f );
 					//result =  (_ColorCMY * (impulse/dens));
 					//float3 result = (float3(0,1,1) * impulse * _Fill );
 

@@ -148,7 +148,7 @@ namespace FluidSim2DProject
             Graphics.Blit(null, dest, m_advectMat); // copies source into a rendertexture with shader (bit block transfer)
         }   
         
-        void AdvectColor(RenderTexture velocity, RenderTexture source, RenderTexture dest, float dissipation, float timeStep)
+        void AdvectColor(RenderTexture velocity,RenderTexture density,  RenderTexture source, RenderTexture dest, float dissipation, float timeStep)
         {
             // Advect a texture based on the velocity witth backwardstracing
             // and let the texture dissipate
@@ -156,6 +156,7 @@ namespace FluidSim2DProject
             m_advectColorMat.SetFloat("_TimeStep", timeStep);
             m_advectColorMat.SetFloat("_Dissipation", dissipation);
             m_advectColorMat.SetTexture("_Velocity", velocity);
+            m_advectColorMat.SetTexture("_Density", density);
             m_advectColorMat.SetTexture("_Source", source);
             m_advectColorMat.SetTexture("_Obstacles", m_obstaclesTex[0]);
 
@@ -203,7 +204,6 @@ namespace FluidSim2DProject
         void AddColor(RenderTexture source, RenderTexture dest, RenderTexture dens, Vector2 pos, float radius, float val)
         {
             Color cmy = new Color(1 - m_fluidColor.r, 1 - m_fluidColor.g, 1 - m_fluidColor.b);
-            print(cmy);
             m_addcolorMat.SetColor("_ColorCMY", cmy);
             m_addcolorMat.SetVector("_Point", pos);
             m_addcolorMat.SetFloat("_Radius", radius);
@@ -325,15 +325,15 @@ namespace FluidSim2DProject
             //Advect temperature against velocity
             Advect(m_velocityTex[READ], m_temperatureTex[READ], m_temperatureTex[WRITE], m_temperatureDissipation, dt);
             //Advect density against velocity
-            //Advect(m_velocityTex[READ], m_densityTex[READ], m_densityTex[WRITE], m_densityDissipation, dt);
+            Advect(m_velocityTex[READ], m_densityTex[READ], m_densityTex[WRITE], m_densityDissipation, dt);
             //Advect col/cmy against velocity
             //Advect(m_velocityTex[READ], m_cmyTex[READ], m_cmyTex[WRITE], 1, dt);
-            //AdvectColor(m_velocityTex[READ], m_cmyTex[READ], m_cmyTex[WRITE],1.0f , dt);
+            AdvectColor(m_velocityTex[READ], m_densityTex[READ], m_cmyTex[READ], m_cmyTex[WRITE],1.0f , dt);
 
             Swap(m_velocityTex);
             Swap(m_temperatureTex);
-            //Swap(m_densityTex);
-            //Swap(m_cmyTex);
+            Swap(m_densityTex);
+            Swap(m_cmyTex);
 
             // change the velocity of flow based on temperatur and density of fluid
             //ApplyBuoyancy(m_velocityTex[READ], m_temperatureTex[READ], m_densityTex[READ], m_velocityTex[WRITE], dt);

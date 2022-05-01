@@ -261,8 +261,8 @@ MonoBehaviour:
   m_smokeWeight: 0.05
   m_numJacobiIterations: 80
   m_impluseRadius: 0.1
-  m_mouseImpluseRadius: 0.05
-  m_impulseScale: 2
+  m_mouseImpluseRadius: 0.02
+  m_impulseScale: 8.25
   m_obstaclePos: []
   m_width: 512
   m_height: 512
