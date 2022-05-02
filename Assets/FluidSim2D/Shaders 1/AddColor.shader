@@ -49,15 +49,25 @@ Shader "FluidSim/AddColor"
 			    if(dis < _Radius) // only if in radius
 			    {
 			        float a = (_Radius - dis) * 0.5;
-					impulse = min(a, 1.0); // weight of lerp
+					impulse = min(a, 1.0) * _Fill; // weight of lerp
 
 					float dens = tex2D(_Density, IN.uv).x;
 			  
-					 //result = ((sourceCol * dens/impulse) + _ColorCMY * impulse/dens) / (2.f * impulse * dens);
-					 result = ((sourceCol  ) + _ColorCMY  ) / (2.f );
-					//result =  (_ColorCMY * (impulse/dens));
-					//float3 result = (float3(0,1,1) * impulse * _Fill );
+					if (dens > 0.f && impulse > 0.f)
+					{
+						result = float3((sourceCol * dens) + (_ColorCMY * impulse)) / float((dens + impulse));
+						//result = ((sourceCol   ) + (_ColorCMY  ) / (2.f );
+						//result =  (_ColorCMY * (impulse/dens));
+						//float3 result = (float3(0,1,1) * impulse * _Fill );
 
+
+					}
+					else if ( dens <= 0)
+					{
+						result = (_ColorCMY);
+					}
+					
+					
 					return float4(result,1); // lerp from current to fill (val/ input)
 
 

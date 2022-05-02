@@ -232,8 +232,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e54b55115a7a8a84b85dc8aad3576ba4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_fluidColor: {r: 1, g: 0, b: 0.13062668, a: 1}
-  m_obstacleColor: {r: 1, g: 0.653165, b: 0, a: 1}
+  m_fluidColor: {r: 0, g: 0.7313299, b: 1, a: 1}
+  m_obstacleColor: {r: 0, g: 0, b: 0, a: 1}
   m_guiMat: {fileID: 2100000, guid: a5e50cfeb3b93bf4197019b67114ff6c, type: 2}
   m_advectMat: {fileID: 2100000, guid: 9f565ce40c7cdff47a4499adc87114e7, type: 2}
   m_buoyancyMat: {fileID: 2100000, guid: 68dae5dee4ec59549b19752db28f52a5, type: 2}
@@ -252,7 +252,7 @@ MonoBehaviour:
   m_rgbTex: {fileID: 0}
   m_cmyTex: []
   m_impulseTemperature: 10
-  m_impulseDensity: 0.04
+  m_impulseDensity: 1
   m_temperatureDissipation: 0.99
   m_velocityDissipation: 0.99
   m_densityDissipation: 0.9999
@@ -261,11 +261,11 @@ MonoBehaviour:
   m_smokeWeight: 0.05
   m_numJacobiIterations: 80
   m_impluseRadius: 0.1
-  m_mouseImpluseRadius: 0.02
-  m_impulseScale: 8.25
+  m_mouseImpluseRadius: 0.015
+  m_impulseScale: 1000
   m_obstaclePos: []
-  m_width: 512
-  m_height: 512
+  m_width: 1024
+  m_height: 1024
 --- !u!4 &930251126
 Transform:
   m_ObjectHideFlags: 0

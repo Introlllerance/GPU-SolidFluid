@@ -72,10 +72,12 @@ Shader "FluidSim/AdvectColor" // decleration (where to find / Name)
 				//float a = (dCenter * .5f + d00 * .125f + d01 * .125f + d10 * .125f + d11 * *.125f) / 5.f;
 				float3 colMixed = float3(1, 1, 1);// is black, when no density
 
-				// can make a white edge, if the value is larger
-				if (dCenter > 0.00001f)
+				if (dCenter > 0.0000000000000001f)
+				//if (dCenter > 0.f) // so like water that flows before color
+				//if (dCenter >= 0.f) // if >= 0 -> background is white, caus dens = 0 -> 0,0,0 -> 1,1,1 in rgb
+
 				{				
-					float a = (dCenter + d00 + d01 + d10 + d11) / 5.f;
+					float a = (dCenter*.5f + d00*.125 + d01 * .125 + d10 * .125 + d11 * .125) / 1.f;
 
 					colMixed = (colCenter * .5f * dCenter / a) + (col00 * .125f * d00 / a) + (col01 * .125f * d01 / a) + (col10 * .125f * d10 / a) + (col11 * .125f * d11 / a);
 					//float3 colMixed = (colCenter * .5f ) + (col00 * .125f ) + (col01 * .125f ) + (col10 * .125f ) + (col11 * .125f);

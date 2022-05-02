@@ -49,7 +49,8 @@ Shader "FluidSim/Impluse1"
 
 				float source = tex2D(_Source, IN.uv).x;
 			  
-			  	return max(0, lerp(source, _Fill, impulse)).xxxx; // lerp from current to fill (val/ input)
+			  	//return max(0, lerp(source, _Fill, impulse)).xxxx; // lerp from current to fill (val/ input)
+				return max(0, source + _Fill * impulse).xxxx;
 			}
 			
 			ENDCG

@@ -20,7 +20,7 @@ namespace FluidSim2DProject
         [SerializeField] RenderTexture[] m_cmyTex;
 
         [SerializeField] float m_impulseTemperature = 10.0f;
-        [SerializeField] float m_impulseDensity = 0.4f;
+        [SerializeField] float m_impulseDensity = 1.0f;
         [SerializeField] [Range(0.95f, 1.1f)] float m_temperatureDissipation = 0.99f;
         [SerializeField] [Range(0.95f, 1.1f)] float m_velocityDissipation = 0.99f;
         [SerializeField] [Range(0.95f, 1.1f)] float m_densityDissipation = 0.9999f;
@@ -56,8 +56,8 @@ namespace FluidSim2DProject
         void Start()
         {
             // add Obstacles
-            m_obstaclePos.Add(new Vector2(0.5f, 0.4f));
-            m_obstaclePos.Add(new Vector2(0.5f, 0.7f));
+            m_obstaclePos.Add(new Vector2(0.5f, 0.1f));
+            m_obstaclePos.Add(new Vector2(0.8f, 0.9f));
             m_obstaclePos.Add(new Vector2(0.4f, 0.8f));
 
             Vector2 size = new Vector2(m_width, m_height);
@@ -165,6 +165,9 @@ namespace FluidSim2DProject
 
         void ApplyBuoyancy(RenderTexture velocity, RenderTexture temperature, RenderTexture density, RenderTexture dest, float timeStep)
         {
+            // val * dt
+
+
             //Buoyancy based on Temperatur/ smoke ambiente and Density and weight and bouyandyVar 
             m_buoyancyMat.SetTexture("_Velocity", velocity);
             m_buoyancyMat.SetTexture("_Temperature", temperature);
@@ -176,15 +179,16 @@ namespace FluidSim2DProject
 
             Graphics.Blit(null, dest, m_buoyancyMat);
         }
-        void UpdateMovement(RenderTexture velocity, RenderTexture density, RenderTexture dest,Vector2 pos, float dt)
+        void UpdateMovement(RenderTexture velocity, RenderTexture density, RenderTexture dest,Vector2 pos,float radius,float val)
         {
+            // val * dt
             //Buoyancy based on Temperatur/ smoke ambiente and Density and weight and bouyandyVar 
             m_updateMovementMat.SetTexture("_Velocity", velocity);
             m_updateMovementMat.SetTexture("_Density", density);
 
             m_updateMovementMat.SetVector("_Point", pos);
-            m_updateMovementMat.SetFloat("_Radius", m_impluseRadius);
-            m_updateMovementMat.SetFloat("_ImpulsScale", m_impulseScale *dt );
+            m_updateMovementMat.SetFloat("_Radius", radius);
+            m_updateMovementMat.SetFloat("_ImpulsScale", val );
         
 
             Graphics.Blit(null, dest, m_updateMovementMat);
@@ -343,9 +347,9 @@ namespace FluidSim2DProject
             //Add particles at specific point
             if (false)
             {
-                ApplyImpulse(m_temperatureTex[READ], m_velocityTex[WRITE], m_implusePos, m_impluseRadius, m_impulseTemperature);
-                ApplyImpulse(m_densityTex[READ], m_densityTex[WRITE], m_implusePos, m_impluseRadius, m_impulseDensity);
-                UpdateMovement(m_velocityTex[READ], m_densityTex[READ], m_velocityTex[WRITE], m_implusePos, dt);
+                ApplyImpulse(m_temperatureTex[READ], m_velocityTex[WRITE], m_implusePos, m_impluseRadius, m_impulseTemperature * dt);
+                ApplyImpulse(m_densityTex[READ], m_densityTex[WRITE], m_implusePos, m_impluseRadius, m_impulseDensity * dt);
+                UpdateMovement(m_velocityTex[READ], m_densityTex[READ], m_velocityTex[WRITE], m_implusePos, m_impluseRadius, m_impulseScale * dt);
 
                 Swap(m_temperatureTex);
                 Swap(m_densityTex);
@@ -364,10 +368,20 @@ namespace FluidSim2DProject
                 pos.y /= m_rect.height;
 
                 float sign = (Input.GetMouseButton(0)) ? 1.0f : -1.0f;
+                if (sign == 1.0f) // dont add vel if remove Color
+                { 
+                    ApplyImpulse(m_temperatureTex[READ], m_temperatureTex[WRITE], pos, m_mouseImpluseRadius, m_impulseTemperature * dt);
+                    UpdateMovement(m_velocityTex[READ], m_densityTex[READ], m_velocityTex[WRITE], pos, m_mouseImpluseRadius, m_impulseScale * dt);
+                    ApplyImpulse(m_densityTex[READ], m_densityTex[WRITE], pos, m_mouseImpluseRadius, m_impulseDensity * sign * dt);
 
-                ApplyImpulse(m_temperatureTex[READ], m_temperatureTex[WRITE], pos, m_mouseImpluseRadius, m_impulseTemperature * dt);
-                ApplyImpulse(m_densityTex[READ], m_densityTex[WRITE], pos, m_mouseImpluseRadius, m_impulseDensity * sign * dt);
-                UpdateMovement(m_velocityTex[READ], m_densityTex[READ], m_velocityTex[WRITE], pos, dt);
+                }
+                else 
+                { 
+                    ApplyImpulse(m_temperatureTex[READ], m_temperatureTex[WRITE], pos, 0, 0);
+                    UpdateMovement(m_velocityTex[READ], m_densityTex[READ], m_velocityTex[WRITE], pos, m_mouseImpluseRadius * 2.0f, m_impulseScale * dt / 10);
+                    ApplyImpulse(m_densityTex[READ], m_densityTex[WRITE], pos, m_mouseImpluseRadius * 2.0f, m_impulseDensity * sign * dt / 10.0f);
+
+                }
                 AddColor(m_cmyTex[READ], m_cmyTex[WRITE],m_densityTex[READ], pos, m_mouseImpluseRadius, m_impulseDensity * sign * dt);
 
                 Swap(m_temperatureTex);
