@@ -64,7 +64,7 @@ Shader "FluidSim/AddColor"
 					}
 					else if ( dens <= 0)
 					{
-						result = (_ColorCMY);
+						result = (_ColorCMY * impulse);
 					}
 					
 					
