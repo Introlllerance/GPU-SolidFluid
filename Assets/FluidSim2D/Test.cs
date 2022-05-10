@@ -8,6 +8,8 @@ namespace FluidSim2DProject
 
     public class Test : MonoBehaviour
     {
+        public enum _paintBrush {Default, Drop };
+        public _paintBrush paintBrush =  _paintBrush.Default;
 
         public Color m_fluidColor = Color.red;
 
@@ -357,7 +359,7 @@ namespace FluidSim2DProject
             }
 
             //If left click down add impluse, if right click down remove impulse from mouse pos.
-            if(Input.GetMouseButton(0) || Input.GetMouseButton(1))
+            if (Input.GetMouseButtonDown(0))
             {
                 Vector2 pos = Input.mousePosition;
 
@@ -367,28 +369,73 @@ namespace FluidSim2DProject
                 pos.x /= m_rect.width;
                 pos.y /= m_rect.height;
 
-                float sign = (Input.GetMouseButton(0)) ? 1.0f : -1.0f;
-                if (sign == 1.0f) // dont add vel if remove Color
-                { 
-                    ApplyImpulse(m_temperatureTex[READ], m_temperatureTex[WRITE], pos, m_mouseImpluseRadius, m_impulseTemperature * dt);
-                    UpdateMovement(m_velocityTex[READ], m_densityTex[READ], m_velocityTex[WRITE], pos, m_mouseImpluseRadius, m_impulseScale * dt);
-                    ApplyImpulse(m_densityTex[READ], m_densityTex[WRITE], pos, m_mouseImpluseRadius, m_impulseDensity * sign * dt);
+                switch ( paintBrush)
+                {
 
+                    case _paintBrush.Drop:
+
+                        float dropMultiplyer = 10.0f;
+                        print("Drop Dropped");
+
+                        ApplyImpulse(m_temperatureTex[READ], m_temperatureTex[WRITE], pos, m_mouseImpluseRadius, m_impulseTemperature * dt);
+                        UpdateMovement(m_velocityTex[READ], m_densityTex[READ], m_velocityTex[WRITE], pos, m_mouseImpluseRadius, m_impulseScale * dt);
+                        ApplyImpulse(m_densityTex[READ], m_densityTex[WRITE], pos, m_mouseImpluseRadius, m_impulseDensity );
+                        AddColor(m_cmyTex[READ], m_cmyTex[WRITE], m_densityTex[READ], pos, m_mouseImpluseRadius * dropMultiplyer, m_impulseDensity  );
+
+                        Swap(m_temperatureTex);
+                        Swap(m_densityTex);
+                        Swap(m_velocityTex);
+                        Swap(m_cmyTex);
+                        break;
+                     
                 }
-                else 
-                { 
-                    ApplyImpulse(m_temperatureTex[READ], m_temperatureTex[WRITE], pos, 0, 0);
-                    UpdateMovement(m_velocityTex[READ], m_densityTex[READ], m_velocityTex[WRITE], pos, m_mouseImpluseRadius * 2.0f, m_impulseScale * dt / 10);
-                    ApplyImpulse(m_densityTex[READ], m_densityTex[WRITE], pos, m_mouseImpluseRadius * 2.0f, m_impulseDensity * sign * dt / 10.0f);
 
+            }
+    
+            // mousebutten down
+            else if(Input.GetMouseButton(0) || Input.GetMouseButton(1) )
+            {
+                switch (paintBrush)
+                {
+                    case _paintBrush.Default:
+
+                        print("Mousebutten down");
+                        Vector2 pos = Input.mousePosition;
+
+                        pos.x -= m_rect.xMin;
+                        pos.y -= m_rect.yMin;
+
+                        pos.x /= m_rect.width;
+                        pos.y /= m_rect.height;
+
+                        float sign = (Input.GetMouseButton(0)) ? 1.0f : -1.0f;
+                        if (sign == 1.0f) // dont add vel if remove Color
+                        {
+                            ApplyImpulse(m_temperatureTex[READ], m_temperatureTex[WRITE], pos, m_mouseImpluseRadius, m_impulseTemperature * dt);
+                            UpdateMovement(m_velocityTex[READ], m_densityTex[READ], m_velocityTex[WRITE], pos, m_mouseImpluseRadius, m_impulseScale * dt);
+                            ApplyImpulse(m_densityTex[READ], m_densityTex[WRITE], pos, m_mouseImpluseRadius, m_impulseDensity * sign * dt);
+
+                        }
+                        else
+                        {
+                            ApplyImpulse(m_temperatureTex[READ], m_temperatureTex[WRITE], pos, 0, 0);
+                            UpdateMovement(m_velocityTex[READ], m_densityTex[READ], m_velocityTex[WRITE], pos, m_mouseImpluseRadius * 2.0f, m_impulseScale * dt / 10);
+                            ApplyImpulse(m_densityTex[READ], m_densityTex[WRITE], pos, m_mouseImpluseRadius * 2.0f, m_impulseDensity * sign * dt / 10.0f);
+
+                        }
+                        AddColor(m_cmyTex[READ], m_cmyTex[WRITE], m_densityTex[READ], pos, m_mouseImpluseRadius, m_impulseDensity * sign * dt);
+
+                        Swap(m_temperatureTex);
+                        Swap(m_densityTex);
+                        Swap(m_velocityTex);
+                        Swap(m_cmyTex);
+
+
+
+
+                        break;
                 }
-                AddColor(m_cmyTex[READ], m_cmyTex[WRITE],m_densityTex[READ], pos, m_mouseImpluseRadius, m_impulseDensity * sign * dt);
-
-                Swap(m_temperatureTex);
-                Swap(m_densityTex);
-                Swap(m_velocityTex);
-                Swap(m_cmyTex);
-
+               
 
             }
 

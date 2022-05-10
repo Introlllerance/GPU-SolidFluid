@@ -232,6 +232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e54b55115a7a8a84b85dc8aad3576ba4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  paintBrush: 1
   m_fluidColor: {r: 0, g: 0.7313299, b: 1, a: 1}
   m_obstacleColor: {r: 0, g: 0, b: 0, a: 1}
   m_guiMat: {fileID: 2100000, guid: a5e50cfeb3b93bf4197019b67114ff6c, type: 2}
